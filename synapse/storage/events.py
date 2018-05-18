@@ -1020,7 +1020,7 @@ class EventsStore(EventsWorkerStore):
                     }
                 )
 
-                chunk_id, _ = self._compute_chunk_id_txn(txn, event)
+                chunk_id, topo = self._compute_chunk_id_txn(txn, event)
 
                 self._simple_update_txn(
                     txn,
@@ -1029,6 +1029,7 @@ class EventsStore(EventsWorkerStore):
                     updatevalues={
                         "outlier": False,
                         "chunk_id": chunk_id,
+                        "topological_ordering": topo,
                     },
                 )
 
@@ -1112,7 +1113,7 @@ class EventsStore(EventsWorkerStore):
             ],
         )
 
-        chunk_id, _topo = self._compute_chunk_id_txn(txn, event)
+        chunk_id, topo = self._compute_chunk_id_txn(txn, event)
 
         self._simple_insert_many_txn(
             txn,
@@ -1121,7 +1122,7 @@ class EventsStore(EventsWorkerStore):
                 {
                     "stream_ordering": event.internal_metadata.stream_ordering,
                     "chunk_id": chunk_id,
-                    "topological_ordering": event.depth,
+                    "topological_ordering": topo,
                     "depth": event.depth,
                     "event_id": event.event_id,
                     "room_id": event.room_id,
